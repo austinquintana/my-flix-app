@@ -1,4 +1,0 @@
-{"_id":{"$oid":"6455877e051be2bd6de1bfbb"},"Username":"Makinley","Password":"12345","Email":"Kinley@test.com","Birthday":{"$date":"2004-08-17T00:00:00Z"},"favoriteMovies":[]}
-{"_id":{"$oid":"64558845051be2bd6de1bfbc"},"Username":"Austin","Password":"Mola","Email":"Austin@test.com","Birthday":{"$date":"2000-07-28T00:00:00Z"},"favoriteMovies":[]}
-{"_id":{"$oid":"645588ca051be2bd6de1bfbd"},"Username":"Trey","Password":"Nitro","Email":"Trey@test.com","Birthday":{"$date":"2000-08-30T00:00:00Z"},"favoriteMovies":[]}
-{"_id":{"$oid":"6455893d051be2bd6de1bfbe"},"Username":"Taylor","Password":"Apex","Email":"Taylor@test.com","Birthday":{"$date":"1999-10-14T00:00:00Z"},"favoriteMovies":[]}
