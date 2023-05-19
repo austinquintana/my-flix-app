@@ -38,8 +38,7 @@ const Genres = Models.Genre;
 const Directors = Models.Director;
 
 // mongoose.connect('mongodb://127.0.0.1:27017/test');
-
-mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 //MIDDLEWARE: log all server requests
 app.use(morgan('common'));
@@ -357,7 +356,7 @@ app.use((err, req, res, next) => {
 
 //START SERVER
 const port = process.env.PORT || 8080;
-app.listen(port, '0.0.0.0',() => {
- console.log('Listening on Port ' + port);
+app.listen(port,  () => {
+  console.log("Listening on port " + port);
 });
 
