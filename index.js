@@ -37,7 +37,9 @@ const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
 
-mongoose.connect('mongodb://127.0.0.1:27017/test');
+// mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 //MIDDLEWARE: log all server requests
 app.use(morgan('common'));
