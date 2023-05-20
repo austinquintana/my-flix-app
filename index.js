@@ -35,11 +35,12 @@ const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
+const CONNECTION_URI = 'mongodb+srv://austinquintana:Athena888?@cluster0.vkycxfr.mongodb.net/?';
 
 //mongoose.connect('mongodb://127.0.0.1:27017/test');
-console.log('Connection_URI:', process.env.CONNECTION_URI);
+console.log('CONNECTION_URI:', process.env.CONNECTION_URI);
 
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/test')
 .then(() => { console.log('Connected to MongoDB'); }) .catch((err) => { console.error(err); });
 
 //MIDDLEWARE: log all server requests
@@ -191,62 +192,54 @@ app.get('/movies/director/:directorName', passport.authenticate('jwt', { session
   }
 });
 
-//CREATE: New User
-//Add a user
-/* We’ll expect JSON in this format
-{
-  ID: Integer,
-  Username: String,
-  Password: String,
-  Email: String,
-  Birthday: Date
-}*/
+//alows new users to register
 app.post('/users',
-  // Validation logic here for request
-  //you can either use a chain of methods like .not().isEmpty()
-  //which means "opposite of isEmpty" in plain english "is not empty"
-  //or use .isLength({min: 5}) which means
-  //minimum value of 5 characters are only allowed
-  [
-    check('Username', 'Username is required').isLength({min: 5}),
-    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
-    check('Password', 'Password is required').not().isEmpty(),
-    check('Email', 'Email does not appear to be valid').isEmail()
-  ], (req, res) => {
+    //validation logic goes here
+    [
+        check('Username', 'Username is required').isLength({min: 5}), // minumum length of username is 5 char
+        check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
+        check('Password', 'Password is required').not().isEmpty(), // password input must not be empty
+        check('Email', 'Email does not appear to be valid').isEmail()
+    ], (req, res) => {
 
-  // check the validation object for errors
-    let errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-  console.log(Users)
-      //if error occurs rest of the code will not be excuted 
-  let hashedPassword = Users.hashPassword(req.body.Password);
-
-  //checks if username already exists 
-  Users.findOne({ Username: req.body.Username })
+        //check validation object for errors
+        let errors = validationResult(req); 
+        if (!errors.isEmpty()){ //if errors is not empty (if there are arreors--->)
+            return res.status(422).json({errors: errors.array()}) //if errors in validation occur then send back to client in an array
+        }
+    console.log(Users)
+        // if error occurs rest of the code will not be executed
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    
+    //check if username already exists
+    Users.findOne( { 'Username' : req.body.Username } )
+    
     .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Username + 'already exists');
-      } else {
-        Users
-          .create({
-            Username: req.body.Username,
-            Password: hashedPassword,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday
-          })
-          .then((user) =>{res.status(201).json(user) })
-        .catch((error) => {
-          console.error(error);
-          res.status(500).send('Error: ' + error);
-        })
-      }
+        if (user) {
+            return res.status(400).send(req.body.Username + 'already exists');
+        } else {
+            //if user doesn´t already exist, use mongoose .create() fxn to create new user.
+            // each key refers to a specific key outline in models.js
+            // each value is set to the content of request body
+            Users
+                .create( {
+                    Username : req.body.Username,
+                    Password : hashedPassword, // now when registering hashed password will be saved in the DB, not the actual pw w
+                    Email : req.body.Email,
+                    Birthday : req.body.Birthday
+                })
+                .then((user) => { res.status(201).json(user)})
+            .catch((error) => {
+                console.error(error);
+                res.status(500).send('Error: ' + error)
+            })
+                // Mongoose uses this information to populate a users document
+        }
     })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    });
+    .catch((error)=> {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+    })
 });
 
 // Get all users
