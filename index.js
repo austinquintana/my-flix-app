@@ -41,7 +41,7 @@ const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
-const CONNECTION_URI="mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/retryWrites=true&w=majority"
+const CONNECTION_URI="mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/MyFlixDB"
 
 
 // mongoose.connect('mongodb://127.0.0.1:27017/test');
@@ -151,7 +151,7 @@ app.post('/users',
    
     .then((user) => {
         if (user) {
-            return res.status(400).send(req.body.Username + 'already exists');
+            return res.status(400).send(req.body.Username + ' already exists');
         } else {
             //if user doesn´t already exist, use mongoose .create() fxn to create new user.
             // each key refers to a specific key outline in models.js
