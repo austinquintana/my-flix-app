@@ -10,27 +10,21 @@ let Users = Models.User,
 passport.use(new LocalStrategy({
   usernameField: 'Username',
   passwordField: 'Password'
-}, (username, password, callback) => {
+}, async (username, password, callback) => {
   console.log(username + '  ' + password);
-  Users.findOne({ Username: username }, (error, user) => {
-    if (error) {
-      console.log(error);
-      return callback(error);
+  console.log("Woo")
+  const user = await Users.findOne({ Username: username })
+  if (!user) {
+    console.log('incorrect username');
+    return callback(null, false, {message: 'Incorrect username or password.'});
+  }
+
+  if (!user.validatePassword(password)) {
+      console.log('incorrect password');
+      return callback(null, false, {message: 'Incorrect password.'});
     }
-
-    if (!user) {
-      console.log('incorrect username');
-      return callback(null, false, {message: 'Incorrect username or password.'});
-    }
-
-    if (!user.validatePassword(password)) {
-        console.log('incorrect password');
-        return callback(null, false, {message: 'Incorrect password.'});
-      }
-
     console.log('finished');
     return callback(null, user);
-  });
 }));
 
 passport.use(new JWTStrategy({
