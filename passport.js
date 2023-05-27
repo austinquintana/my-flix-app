@@ -1,3 +1,5 @@
+const jwtSecret = 'your_jwt_secret';
+
 const passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
   Models = require('./models.js'),
