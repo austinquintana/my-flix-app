@@ -11,8 +11,6 @@ passport.use(new LocalStrategy({
   usernameField: 'Username',
   passwordField: 'Password'
 }, async (username, password, callback) => {
-  console.log(username + '  ' + password);
-  console.log("Woo")
   const user = await Users.findOne({ Username: username })
   if (!user) {
     console.log('incorrect username');
@@ -21,7 +19,7 @@ passport.use(new LocalStrategy({
 
   if (!user.validatePassword(password)) {
       console.log('incorrect password');
-      return callback(null, false, {message: 'Incorrect password.'});
+      return callback(null, false, {message: 'Incorrect username or password.'});
     }
     console.log('finished');
     return callback(null, user);
