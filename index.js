@@ -42,7 +42,7 @@ const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
-
+const CONNECTION_URI = "mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/retryWrites=true&w=majority"
 
 // mongoose.connect('mongodb://127.0.0.1:27017/test');
 // console.log('CONNECTION_URI:', process.env.CONNECTION_URI);
