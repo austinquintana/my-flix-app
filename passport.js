@@ -1,4 +1,4 @@
-const jwtSecret = 'your_jwt_secret';
+const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 const passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
@@ -29,7 +29,7 @@ passport.use(new LocalStrategy({
 
 passport.use(new JWTStrategy({
   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-  secretOrKey: 'your_jwt_secret'
+  secretOrKey: jwtSecret
 }, (jwtPayload, callback) => {
   return Users.findById(jwtPayload._id)
     .then((user) => {

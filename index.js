@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const app = express();
 const mongoose = require('mongoose');
 const Models = require('./models.js');
-mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/test')
+mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 .then(() => { console.log('Connected to MongoDB'); }) .catch((err) => { console.error(err); });
 
 const cors = require('cors');
@@ -42,10 +42,6 @@ const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
-const CONNECTION_URI = "mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/retryWrites=true&w=majority"
-
-// mongoose.connect('mongodb://127.0.0.1:27017/test');
-// console.log('CONNECTION_URI:', process.env.CONNECTION_URI);
 
 
 //MIDDLEWARE: log all server requests
@@ -66,7 +62,7 @@ app.get('/documentation', (req, res) => {
 
 
 //GET all movies
-app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/movies', (req, res) => {
   Movies.find()
     .then((movies) => {
       res.status(201).json(movies);
