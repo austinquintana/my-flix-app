@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const app = express();
 const mongoose = require('mongoose');
 const Models = require('./models.js');
-mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/test')
+mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 .then(() => { console.log('Connected to MongoDB'); }) .catch((err) => { console.error(err); });
 
 const cors = require('cors');
@@ -42,10 +42,6 @@ const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
-const CONNECTION_URI = "mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/retryWrites=true&w=majority"
-
-// mongoose.connect('mongodb://127.0.0.1:27017/test');
-// console.log('CONNECTION_URI:', process.env.CONNECTION_URI);
 
 
 //MIDDLEWARE: log all server requests
@@ -66,7 +62,7 @@ app.get('/documentation', (req, res) => {
 
 
 //GET all movies
-app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/movies', (req, res) => {
   Movies.find()
     .then((movies) => {
       res.status(201).json(movies);
@@ -79,9 +75,9 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) 
 
 
 //READ: Get data about a single movie
-app.get('/movies/:title', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { title } = req.params;
-  const movie = movies.find( movie => movie.title === title);
+app.get('/movies/id/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { id } = req.params;
+  const movie = movies.find( movie => movie._id === id);
 
 
   if (movie) {
@@ -129,6 +125,7 @@ app.post('/users',
         check('Username', 'Username is required').isLength({min: 5}), // minumum length of username is 5 char
         check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
         check('Password', 'Password is required').not().isEmpty(), // password input must not be empty
+        check ('ControlPassword', 'Passwords do not match').custom((value, { req }) => value === req.body.Password),
         check('Email', 'Email does not appear to be valid').isEmail()
     ], (req, res) => {
 
@@ -250,29 +247,29 @@ app.put('/users/:Username',
 
 // Add a movie to a user's list of favorites
 app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
+  console.log(req.params);
   Users.findOneAndUpdate({ Username: req.params.Username }, {
-     $push: { FavoriteMovies: req.params.MovieID }
+     $push: { favoriteMovies: req.params.MovieID }
    },
-   { new: true }, // This line makes sure that the updated document is returned
-  (err, updatedUser) => {
-    if (err) {
-      console.error(err);
+   { new: true }) // This line makes sure that the updated document is returned
+   .then(( updatedUser) => {
+      if (!updatedUser) { res.status(404).send('error user not found'); } 
+      else{res.json(updatedUser);}
+    }) 
+    .catch((err)=> {
       res.status(500).send('Error: ' + err);
-    } else {
-      res.json(updatedUser);
-    }
-  });
+    });
 });
 
 
 //DELETE: Favorite movie
-app.delete('/users/:id/:movieTitle', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
   const { id, movieTitle } = req.params;
 
 
-  let user = users.find(user => user.id == id);
+  let user = users.find(user => user.Username == id);
   let favoriteMovies = user.favoriteMovies;
-  let movieToDelete = favoriteMovies.find(movie => movie.title === movieTitle);
+  let movieToDelete = favoriteMovies.find(movie => movie.Title === movieTitle);
 
 
   if (user) {
