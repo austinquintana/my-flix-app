@@ -263,21 +263,18 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
 
 
 //DELETE: Favorite movie
-app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { id, movieTitle } = req.params;
-
-
-  let user = users.find(user => user.Username == id);
-  let favoriteMovies = user.favoriteMovies;
-  let movieToDelete = favoriteMovies.find(movie => movie.Title === movieTitle);
-
-
-  if (user) {
-    favoriteMovies = favoriteMovies.filter(movie => movie.title !== movieTitle);
-    res.status(200).send(`${movieTitle} has been removed from user ${user.id}'s favorite movies`);
-  } else {
-    res.status(400).send('User not found');
-  }
+app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  Users.findOneAndUpdate({ Username: req.params.Username }, {
+    $pull: { favoriteMovies: req.params.MovieID }
+  },
+  { new: true }) // This line makes sure that the updated document is returned
+  .then(( updatedUser) => {
+     if (!updatedUser) { res.status(404).send('error user not found'); } 
+     else{res.json(updatedUser);}
+   }) 
+   .catch((err)=> {
+     res.status(500).send('Error: ' + err);
+   });
 });
 
 
@@ -286,7 +283,7 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
   Users.findOneAndRemove({ Username: req.params.Username })
     .then((user) => {
       if (!user) {
-        res.status(400).send(req.params.Username + ' was not found');
+        res.status(404).send(req.params.Username + ' was not found');
       } else {
         res.status(200).send(req.params.Username + ' was deleted.');
       }
