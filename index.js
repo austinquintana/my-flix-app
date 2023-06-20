@@ -75,7 +75,7 @@ app.get('/movies', (req, res) => {
 
 
 //READ: Get data about a single movie
-app.get('/movies/id/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/movies/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const { id } = req.params;
   const movie = movies.find( movie => movie._id === id);
 
