@@ -40,8 +40,8 @@ const { check, validationResult } = require('express-validator');
 //Integrating Mongoose and connecting MongoDB
 const Movies = Models.Movie;
 const Users = Models.User;
-const Genres = Models.Genre;
-const Directors = Models.Director;
+const Genre = Models.Genre;
+const Director = Models.Director;
 
 
 //MIDDLEWARE: log all server requests
@@ -74,51 +74,96 @@ app.get('/movies', (req, res) => {
 });
 
 
-//READ: Get data about a single movie
+// //READ: Get data about a single movie
+// app.get('/movies/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+//   const { id } = req.params;
+//   const movie = movies.find( movie => movie._id === id);
+
+
+//   if (movie) {
+//     res.status(200).json(movie);
+//   } else {
+//     res.status(404).send('Movie not found');
+//   }
+// });
+
 app.get('/movies/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { id } = req.params;
-  const movie = movies.find( movie => movie._id === id);
-
-
-  if (movie) {
-    res.status(200).json(movie);
-  } else {
-    res.status(404).send('Movie not found');
-  }
+  Movie.findById(req.params.id)
+    .then((movie) => {
+      if (!movie) {
+        res.status(404).send('Movie not found');
+      } else {
+        res.status(200).json(movie);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
 
-//READ: Return data about a genre (description) by name/title
+// //READ: Return data about a genre (description) by name/title
+// app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: false }), (req, res) => {
+//   const { genreName } = req.params;
+//   const genre = movies
+//     .filter(movie => movie.genres.some(genre => genre.name === genreName))
+//     .map(movie => movie.genres.find(genre => genre.name === genreName));
+
+
+//   if (genre) {
+//     res.status(200).json(genre);
+//   } else {
+//     res.status(404).send('Genre not found');
+//   }
+// });
+
+// Get data about movies by a genre
 app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { genreName } = req.params;
-  const genre = movies
-    .filter(movie => movie.genres.some(genre => genre.name === genreName))
-    .map(movie => movie.genres.find(genre => genre.name === genreName));
-
-
-  if (genre) {
-    res.status(200).json(genre);
-  } else {
-    res.status(404).send('Genre not found');
-  }
+  Movies.find({ 'Genre.Name': req.params.genreName })
+    .then((movies) => {
+      if (!movies) {
+        res.status(404).send('Movies of this genre not found');
+      } else {
+        res.status(200).json(movies);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
+// //READ: Return data about a director by name
+// app.get('/movies/director/:directorName', passport.authenticate('jwt', { session: false }), (req, res) => {
+//   const { directorName } = req.params;
+//   const director = movies.find(movie => movie.director.firstName + " " + movie.director.lastName === directorName)?.director;
 
-//READ: Return data about a director by name
+
+//   if (director) {
+//     res.status(200).json(director);
+//   } else {
+//     res.status(404).send('Director not found');
+//   }
+// });
+
+// Get data about movies by a director
 app.get('/movies/director/:directorName', passport.authenticate('jwt', { session: false }), (req, res) => {
-  const { directorName } = req.params;
-  const director = movies.find(movie => movie.director.firstName + " " + movie.director.lastName === directorName)?.director;
-
-
-  if (director) {
-    res.status(200).json(director);
-  } else {
-    res.status(404).send('Director not found');
-  }
+  Movies.find({ 'Director.Name': req.params.directorName })
+    .then((movies) => {
+      if (!movies) {
+        res.status(404).send('Movies by this director not found');
+      } else {
+        res.status(200).json(movies);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
 });
 
-
-//alows new users to register
+//allows new users to register
 app.post('/users',
     //validation logic goes here
     [
