@@ -12,7 +12,7 @@ mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 
 const cors = require('cors');
 app.use(cors());
-let allowedOrigins = ['http://localhost:8080', 'https://moviesdbaq.netlify.app', 'http://localhost:1234', 'https://austinmovieapp.herokuapp.com'];
+let allowedOrigins = ['http://localhost:8080', 'https://moviesdbaq.netlify.app/', 'http://localhost:1234', 'https://austinmovieapp.herokuapp.com/'];
 
 
 app.use(cors({
