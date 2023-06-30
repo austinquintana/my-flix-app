@@ -10,8 +10,7 @@ const Models = require('./models.js');
 mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 .then(() => { console.log('Connected to MongoDB'); }) .catch((err) => { console.error(err); });
 
-const cors = require('cors');
-app.use(cors());
+const cors = require("cors");
 let allowedOrigins = [
   "http://localhost:8080", 
   "https://moviesdbaq.netlify.app", 
