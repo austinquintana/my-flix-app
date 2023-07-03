@@ -12,8 +12,7 @@ mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 
 const cors = require('cors');
 app.use(cors());
-
-let allowedOrigins = process.env.ALLOWED_ORIGINS.split(',')
+let allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:8080').split(',')
 
 
 app.use(cors({
