@@ -12,19 +12,20 @@ mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 
 const cors = require('cors');
 app.use(cors());
-// let allowedOrigins = ['http://localhost:8080', 'https://moviesdbaq.netlify.app', 'http://localhost:1234', 'https://austinmovieapp.herokuapp.com'];
+
+let allowedOrigins = process.env.ALLOWED_ORIGINS.split(',')
 
 
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     if(!origin) return callback(null, true);
-//     if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
-//       let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
-//       return callback(new Error(message ), false);
-//     }
-//     return callback(null, true);
-//   }
-// }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use(bodyParser.json());
 // Authentication (auth.js is handling login endpoint and generating JWT tokens)
@@ -167,7 +168,7 @@ app.get('/movies/director/:directorName', passport.authenticate('jwt', { session
 app.post('/users',
     //validation logic goes here
     [
-        check('Username', 'Username is required').isLength({min: 5}), // minumum length of username is 5 char
+        check('Username', 'Username is required').isLength({min: 5}), // min length of username is 5 char
         check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
         check('Password', 'Password is required').not().isEmpty(), // password input must not be empty
         check ('ControlPassword', 'Passwords do not match').custom((value, { req }) => value === req.body.Password),
@@ -177,7 +178,7 @@ app.post('/users',
 
         //check validation object for errors
         let errors = validationResult(req);
-        if (!errors.isEmpty()){ //if errors is not empty (if there are arreors--->)
+        if (!errors.isEmpty()){ //if errors is not empty (if there are errors--->)
             return res.status(422).json({errors: errors.array()}) //if errors in validation occur then send back to client in an array
         }
     console.log(Users)
@@ -256,14 +257,14 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
 //update user info
 app.put('/users/:Username',
 [
-    check('Username', 'Username is required').isLength({min: 5}), // minumum length of username is 5 char
+    check('Username', 'Username is required').isLength({min: 5}), // min length of username is 5 char
     check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
     check('Password', 'Password is required').not().isEmpty(), // password input must not be empty
     check('Email', 'Email does not appear to be valid').isEmail()
 ],
  passport.authenticate('jwt', {session: false}), (req, res) => {
     let errors = validationResult(req);
-        if (!errors.isEmpty()){ //if errors is not empty (if there are arreors--->)
+        if (!errors.isEmpty()){ //if errors is not empty (if there are errors--->)
             return res.status(422).json({errors: errors.array()}) //if errors in validation occur then send back to client in an array
         }
     console.log(Users)
