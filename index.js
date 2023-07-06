@@ -12,19 +12,19 @@ mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
 
 const cors = require('cors');
 app.use(cors());
-// let allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:8080').split(',')
+let allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:8080').split(',')
 
 
-// app.use(cors({
-//   origin: (origin, callback) => {
-//     if(!origin) return callback(null, true);
-//     if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
-//       let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
-//       return callback(new Error(message ), false);
-//     }
-//     return callback(null, true);
-//   }
-// }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+      let message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+      return callback(new Error(message ), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 app.use(bodyParser.json());
 // Authentication (auth.js is handling login endpoint and generating JWT tokens)
