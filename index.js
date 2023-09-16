@@ -7,7 +7,8 @@ const morgan = require('morgan');
 const app = express();
 const mongoose = require('mongoose');
 const Models = require('./models.js');
-mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
+// mongoose.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017/cfDB')
+mongoose.connect("mongodb+srv://austinquintana:harleyathena@cluster0.vkycxfr.mongodb.net/myFlixDB")
 .then(() => { console.log('Connected to MongoDB'); }) .catch((err) => { console.error(err); });
 
 const cors = require('cors');
@@ -178,6 +179,7 @@ app.post('/users',
         //check validation object for errors
         let errors = validationResult(req);
         if (!errors.isEmpty()){ //if errors is not empty (if there are errors--->)
+          console.log({errors: errors.array()})
             return res.status(422).json({errors: errors.array()}) //if errors in validation occur then send back to client in an array
         }
     console.log(Users)
